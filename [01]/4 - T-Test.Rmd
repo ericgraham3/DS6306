@@ -1,0 +1,71 @@
+---
+title: "4: T-Test"
+output: powerpoint_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Six Steps of Hypothesis Testing
+
+1. Identify the null (H~0~) and alternative (H~a~) hypotheses.
+2. Find the critical value.
+3. Find the test statistic (t-value) for the data.
+4. Find the p-value.
+5. Reject or fail to reject H~0~.
+6. Present conclusion.
+
+## Step 1: Identify the null (H~0~) and alternative (H~a~) hypotheses.
+
+We are testing the claim that the mean age of the distribution of Beach Comber 
+patrons is different than 21. This claim implies that we're testing whether the 
+mean could be less than or greater than 21, so we will conduct a two-tailed
+t-test:
+
+### H~0~: $\mu = 21$
+
+### H~a~: $\mu \neq 21$
+
+## Step 2: Find the Critical Value
+
+The critical value is found by determining the significance level ($\alpha$) and
+degrees of freedom for our test, and looking those values up on a table (or, in
+our case, using the qt() function from The R Stats Package).
+
+In the absence of a stated confidence level we assume 95%, which means that our 
+significance level is 0.025 (since this is a two-tailed test).
+
+For a two-tailed test, the degrees of freedom for our data is equal to n-2 (in
+our case, df = 5).
+
+## Step 2: Code to Determine Critical Value
+
+```{r}
+sample = c(25, 19, 37, 29, 40, 28, 31)
+significance_level = 0.05/2
+degrees_of_freedom = length(sample) - 2
+critical_value = qt(p = significance_level, df = degrees_of_freedom)
+```
+
+### Critical Value = `r critical_value`
+
+## Steps 3, 4, and 5: Find the Test Statistic, Find the P-Value, and Reject or Fail to Reject H~0~
+
+The t.test() function in the R Stats Package will take our sample vector, with
+arguments for the type of test, null hypothesis, and confidence level, and 
+return our test statistic, p-value, and a determination as to whether we should
+reject or fail to reject H~0~.
+
+## Steps 3, 4, and 5: Code for T-Test
+
+```{r}
+t.test(sample, alternative = c("two.sided"), mu = 21, conf.level = 0.95)
+```
+
+## Step 6: Present Conclusion
+
+There is enough evidence to suggest that the true mean age of Beach Comber 
+patrons is not 21. We are 95% confident that the true mean age of patrons is
+between 23.3 and 36.4. However, we encourage the staff to continue to be 
+vigilant, as at least one member of our sample was under the age of 21!

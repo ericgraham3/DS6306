@@ -1,0 +1,70 @@
+---
+title: "2: Central Limit Theorem"
+output: powerpoint_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 2.1: Generate Chi-Square Distribution
+
+```{r}
+population = rchisq(10000000, 2)
+```
+
+## 2.2: Histogram of Chi-Square Distribution
+
+```{r}
+hist(population, col = "blue", main = paste("Chi-Square Distribution"), xlab = "Values", xlim = c(0,15))
+```
+
+## 2.3: Mean and Standard Deviation of Chi-Square Distribution
+
+### Mean: 
+
+```{r}
+mean(population)
+```
+
+### Standard Deviation:
+
+```{r}
+sd(population)
+```
+
+## 2.4: Expected Distribution of Sample Means
+
+### According to the Central Limit Theorem, the distribution of means for samples of size 50 from this population:
+
+- Should be approximately normal
+- Should have the same mean as the population
+- Should have a standard deviation equal to $\frac{\sigma}{\sqrt{n}}$
+
+## 2.5: Simulated Distribution of Sample Means
+
+```{r}
+simulations = 10000
+xbar_holder = numeric(simulations)
+for (i in 1:simulations)
+{
+  sample = sample(population, 50)
+  xbar = mean(sample)
+  xbar_holder[i] = xbar
+}
+hist(xbar_holder, col = "blue", main = paste("Histogram of Distribution of Sample Means"), xlab = "Sample Mean", xlim = c(0,4))
+```
+
+## 2.6: Mean and Standard Deviation of Sample Means
+
+### Mean:
+
+```{r}
+mean(xbar_holder)
+```
+
+### Standard Deviation:
+
+```{r}
+sd(xbar_holder)
+```

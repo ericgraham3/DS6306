@@ -1,0 +1,27 @@
+---
+title: '3: CLT on ChatGPT'
+output: powerpoint_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Observations
+
+I provided ChatGPT with the code from CLT_2.rmd and the six questions from our 
+live session deck. The full output is too lengthy for a PowerPoint slide, but 
+can be found 
+[here](https://chatgpt.com/share/ed1cb7b1-cb19-46db-95a3-29f74e368027).
+
+1. ChatGPT correctly identified the solution to the questions and generated
+what appears to be functional code. The model's extensive training certainly
+included a lot of instructional material on statistics and the R language.
+
+2. ChatGPT's code was very similar to my own, but it was better than mine with 
+regards to the explicit use of variables. For part 4 (expected standard 
+deviation) it did a better job of showing its work: I didn't show my calculation 
+for that value, but ChatGPT did.
+
+3. This suggests that our worst fears may be justified: ChatGPT could, one day, 
+replace all students.

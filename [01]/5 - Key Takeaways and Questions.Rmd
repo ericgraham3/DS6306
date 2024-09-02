@@ -1,0 +1,43 @@
+---
+title: '5: Key Takeaways and Questions'
+output: powerpoint_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Key Takeaways
+
+1. We learned the history and general landscape of the Data Science field, 
+including the skills needed to work as a data scientist.
+
+2. We learned about the methodology and importance of conducting reproducible 
+research.
+
+3. We learned some basics of R and Github, and how those can be leveraged to 
+solve statistical problems in a workflow for reproducible research.
+
+4. Having worked on the FLS assignments, I feel like I have a much better understanding of the distribution of sample means. This eluded me in my undergrad statistics 
+class.
+
+5. I learned that you can spend more time working on markdown than it takes to
+code the solution to a problem.
+
+## Questions
+
+1. I would like to store my RMD files for this assignment (and future ones) on 
+Github, both as a way to improve my contribution heatmap and as a way to 
+practice using Git in R. Is that okay? If so, does it need to be a private 
+repo?
+
+2. Any additional thoughts/explanation of the statistics that we used in this
+unit (CLT, distribution of sample means) and their practical application in data
+science would be huge. The lectures for this course are the best explanations I 
+have seen for these topics, I just tend to benefit from learning about math 
+concepts from as many angles as possible, and I want to be able to think more 
+clearly about how to apply them.
+
+3. Am I doing too much, or too little, with the markdown and presentation? Do 
+you have any tips on how to to streamline the RMD workflow (while still meeting
+the quality expectations of our work)?
