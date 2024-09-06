@@ -80,3 +80,61 @@ delay = summarize(by_dest,
 
 delay = filter(delay, count > 20, dest != "HNL")
 delay
+
+# lectures
+
+library(ggplot2)
+library(dplyr)
+mpg %>% filter(class == "compact")
+mpg %>% arrange(manufacturer, cty) %>% print(n = 30)
+
+library(GGally)
+mpg %>% select(class, cty, hwy) %>% ggpairs(aes(color = class))
+
+fifa = read.csv("[03]/FIFA Players.csv")
+fifa %>% filter(Preferred.Foot == "Right" | Preferred.Foot == "Left") %>% 
+  select(Finishing, BallControl, ShotPower, Preferred.Foot) %>%
+  ggpairs(aes(color = Preferred.Foot))
+
+mpg_diff = mpg %>% mutate(diff_hc = hwy - cty)
+print(mpg_diff)
+
+mpg %>% mutate(diff_hc = hwy - cty) %>% 
+  ggplot(aes(x=displ, y = diff_hc, shape = manufacturer)) +
+  geom_point()
+
+mpg %>% group_by(class, year) %>% summarize(meanCTY = mean(cty), count = n())
+
+fifa %>% group_by(Position) %>% 
+  filter(!is.na(BallControl)) %>% 
+  summarize(mean_bc = mean(BallControl), count = n()) %>% 
+  ggplot(aes(x = Position, y = mean_bc)) + 
+  geom_col()
+
+library(tidyverse)
+
+df = data.frame(Name = c("Jack","Julie","Cali","Sunny","James"), Age = c(3,4,2,1,5), Height = c(23,25,30,29,24), Gender = c("Male","Female","Female","Female","Male"))
+df %>% group_by(Gender) %>% summarize(MeanHeight = mean(Height))
+
+# factors
+
+#Dataframe for the Example
+age = c(22,21,NA,24,19,20,23)
+yrs_math_ed = c(4,5,NA,2,5,3,5)
+names = c("Mary","Martha","Rosy","Kim","Kristen","Amy","Sam")
+subject = c("English","Math",NA,"Sociology","Math","Music","Dance")
+df = data.frame(Age = age, Years = yrs_math_ed,Name = names, Major = subject)
+df
+str(df)
+# Names and Subjects are already factors.
+
+mpg %>% ggplot(aes(x = hwy, y = cty, color = as.factor(cyl))) +
+  geom_point()
+
+cyl_fact = factor(mpg$cyl)
+cyl_fact
+levels(cyl_fact) = c("Four", "Five", "Six", "Eight")
+cyl_fact
+
+displ_factor = cut(mpg$displ, breaks = c(1,4,6,8), labels = c("Low", "Medium", "High"))
+displ_factor
