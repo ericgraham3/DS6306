@@ -111,9 +111,8 @@ comp_dataset <- fifa %>%
           labels = c("Teens", "20s", "30s", "40s"),
           right = TRUE),
       levels = c("Teens", "20s", "30s", "40s"),
-      ordered = TRUE
-    ),
-  Preferred.Foot = factor(Preferred.Foot, levels = c("Left", "Right"))
+      ordered = TRUE),
+      Preferred.Foot = factor(Preferred.Foot, levels = c("Left", "Right"))
   )
 summary(comp_dataset)
 ```
