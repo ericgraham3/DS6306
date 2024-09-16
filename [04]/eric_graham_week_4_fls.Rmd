@@ -1,0 +1,107 @@
+---
+title: DS6371 Week 1 FLS
+author: Eric Graham
+output: 
+  powerpoint_presentation:
+    slide_level: 2
+    reference_doc: presentation.pptx
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+options(scipen=999)
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(RCurl)
+library(ggthemes)
+library(WDI)
+```
+
+# 1: Restaurant Data from Baltimore
+
+```{r, echo = TRUE}
+restaurant_xml = getURL("https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Frestaurants.xml")
+restaurant_doc = xmlParse(restaurant_xml, useInternalNodes = TRUE)
+names = xpathSApply(restaurant_doc,"//name",xmlValue)
+zip_code = xpathSApply(restaurant_doc,"//zipcode",xmlValue)
+council_district = xpathSApply(restaurant_doc,"//councildistrict",xmlValue)
+restaurants = data.frame(names, zip_code, council_district)
+head(restaurants)
+sushi_restaurants = grep("sushi", restaurants$names, ignore.case = TRUE)
+length(sushi_restaurants)
+cd_11_restaurants = restaurants %>% filter(council_district == 11)
+cd_11_sushi_restaurants = grep("sushi", cd_11_restaurants, ignore.case = TRUE)
+length(cd_11_sushi_restaurants)
+restaurants %>% mutate(council_district = factor(council_district, levels = 1:12)) %>% 
+  ggplot(aes(x = council_district)) +
+  geom_bar(fill = "blue") +
+  labs(x = "Council District", y = "Number of Restaurants", title = "Baltimore Restaurants by Council District") +
+  theme_economist()
+```
+
+# 2: API EDA
+
+```{r}
+market_cap = WDIsearch("market cap")
+market_cap
+inflation = WDIsearch("inflation")
+inflation
+impoverishing = WDIsearch("impoverishing expenditure")
+impoverishing
+private_health = WDIsearch("private health")
+private_health
+
+# "SI.SPR.BL50.ZS" currently unavailable
+```
+
+```{r}
+indicators = c("CM.MKT.LCAP.CD", "FP.CPI.TOTL.ZG", "SH.SGR.IRSK.ZS", "SH.XPD.PVTD.PC.CD")
+data = WDI(indicator = indicators, start = 2003, end = 2023)
+us_data = data %>% filter(country == "United States") %>% 
+  rename(market_cap = CM.MKT.LCAP.CD, inflation = FP.CPI.TOTL.ZG, impoverishing_risk = SH.SGR.IRSK.ZS, private_health = SH.XPD.PVTD.PC.CD)
+us_data
+```
+
+```{r}
+us_data %>% filter(year <= "2021") %>% 
+  ggplot(aes(x = year, y = market_cap / 1e12)) +
+  geom_line() +
+  labs(x = "Year", y = "Market Cap (in Trillions of Dollars)", title = "Market Cap of Listed US Companies, 2003 - 2022") +
+  theme_economist()
+```
+
+```{r}
+us_data %>% ggplot(aes(x = year, y = inflation)) +
+  geom_line() +
+  labs(x = "Year", y = "Inflation %", title = "% Inflation of US Consumer Prices, 2003 - 2023") +
+  theme_economist()
+```
+
+```{r}
+us_data %>% filter(year <= "2022") %>% 
+  ggplot(aes(x = year, y = impoverishing_risk * 100)) + 
+  geom_line() +
+  scale_y_continuous(limits = c(0, 100)) +  
+  labs(x = "Year", y = "% of Population", title = "US Percentage of Population at Risk of\n Impoverishing Healthcare Expense\n 2003 - 2022") +
+  theme_economist()
+```
+
+```{r}
+us_data %>% filter(year <= "2021") %>% 
+  ggplot(aes(x = year, y = private_health)) + 
+  geom_line() +
+  labs(x = "Year", y = "$ Amount", title = "US Per Capita Private Health Expenditure, 2003 - 2021") +
+  theme_economist()
+```
+
+```{r}
+us_data %>% filter(year <= "2021") %>% 
+  ggplot(aes(x = inflation, y = market_cap / 1e12)) +
+  geom_point(color = "blue") +
+  geom_text(aes(label = year), vjust = -0.5, hjust = .5, size = 3, color = "black") +
+  labs(x = "Inflation (%)", 
+       y = "Market Cap (Trillions US$)", 
+       title = "Market Capitalization and Inflation in the US, 2003 - 2021") +
+  theme_economist()
+```
