@@ -16,23 +16,47 @@ library(ggplot2)
 library(RCurl)
 library(ggthemes)
 library(WDI)
+library(XML)
 ```
 
 # 1: Restaurant Data from Baltimore
 
+I used getURL to retrieve restaurant data from web and then used xmlTreeParse and xpathSApply functions to extract the names, Zip Code, and Council District of each entry.
+
 ```{r, echo = TRUE}
 restaurant_xml = getURL("https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Frestaurants.xml")
-restaurant_doc = xmlParse(restaurant_xml, useInternalNodes = TRUE)
+restaurant_doc = xmlTreeParse(restaurant_xml, useInternalNodes = TRUE)
 names = xpathSApply(restaurant_doc,"//name",xmlValue)
 zip_code = xpathSApply(restaurant_doc,"//zipcode",xmlValue)
 council_district = xpathSApply(restaurant_doc,"//councildistrict",xmlValue)
 restaurants = data.frame(names, zip_code, council_district)
 head(restaurants)
+```
+
+---
+
+I then used the grep function (which is so much easier to use than regex!) to search for restaurant names which include the word "sushi." I found 9.
+
+```{r, echo = TRUE}
 sushi_restaurants = grep("sushi", restaurants$names, ignore.case = TRUE)
 length(sushi_restaurants)
+```
+
+---
+
+I then created a separate dataframe which was filtered for restaurants in Council District 11, and found only one sushi restaurant there.
+
+```{r, echo = TRUE}
 cd_11_restaurants = restaurants %>% filter(council_district == 11)
 cd_11_sushi_restaurants = grep("sushi", cd_11_restaurants, ignore.case = TRUE)
 length(cd_11_sushi_restaurants)
+```
+
+---
+
+Lastly, I used ggplot to created a barplot showing a count of restaurants by Council District.
+
+```{r, echo = TRUE}
 restaurants %>% mutate(council_district = factor(council_district, levels = 1:12)) %>% 
   ggplot(aes(x = council_district)) +
   geom_bar(fill = "blue") +
@@ -40,28 +64,51 @@ restaurants %>% mutate(council_district = factor(council_district, levels = 1:12
   theme_economist()
 ```
 
+
+
 # 2: API EDA
 
-```{r}
+## Introduction
+
+I wanted to use the World Bank API to look at some economic trends in the United States. I used the WDI package to find data related to market capitalization, inflation, and per capita private health expenditures. 
+
+```{r, results = "hide"}
 market_cap = WDIsearch("market cap")
 market_cap
 inflation = WDIsearch("inflation")
 inflation
-impoverishing = WDIsearch("impoverishing expenditure")
-impoverishing
 private_health = WDIsearch("private health")
 private_health
-
-# "SI.SPR.BL50.ZS" currently unavailable
+fifty_below = WDIsearch("percent of median")
+fifty_below
+homeless = WDIsearch("homeless")
+homeless
+slums = WDIsearch("slums")
+slums
 ```
 
-```{r}
-indicators = c("CM.MKT.LCAP.CD", "FP.CPI.TOTL.ZG", "SH.SGR.IRSK.ZS", "SH.XPD.PVTD.PC.CD")
+```{r, echo = TRUE, results = "hide"}
+indicators = c("CM.MKT.LCAP.CD", "FP.CPI.TOTL.ZG", "IN.POV.HH.SLUMS.NUM", "SH.XPD.PVTD.PC.CD")
 data = WDI(indicator = indicators, start = 2003, end = 2023)
 us_data = data %>% filter(country == "United States") %>% 
-  rename(market_cap = CM.MKT.LCAP.CD, inflation = FP.CPI.TOTL.ZG, impoverishing_risk = SH.SGR.IRSK.ZS, private_health = SH.XPD.PVTD.PC.CD)
+  rename(market_cap = CM.MKT.LCAP.CD, inflation = FP.CPI.TOTL.ZG, households_slums = IN.POV.HH.SLUMS.NUM, private_health = SH.XPD.PVTD.PC.CD)
 us_data
 ```
+
+---
+
+Unfortunately, the World Bank doesn't provide any data on homelessness. They provide data on the percentage of households living in "slums," and the United States didn't report any data for that indicator. 
+
+```{r, echo = TRUE}
+homeless = WDIsearch("homeless")
+homeless
+us_slums = us_data %>% filter(!is.na(households_slums))
+us_slums
+```
+
+## Market Capitalization of Listed Companies
+
+Since 2003, the total market capitalization of US companies has risen steadily.
 
 ```{r}
 us_data %>% filter(year <= "2021") %>% 
@@ -71,6 +118,10 @@ us_data %>% filter(year <= "2021") %>%
   theme_economist()
 ```
 
+## Inflation
+
+There has been much public discourse around inflation in the past few years. The below chart shows a dramatic spike in inflation after 2020.
+
 ```{r}
 us_data %>% ggplot(aes(x = year, y = inflation)) +
   geom_line() +
@@ -78,14 +129,9 @@ us_data %>% ggplot(aes(x = year, y = inflation)) +
   theme_economist()
 ```
 
-```{r}
-us_data %>% filter(year <= "2022") %>% 
-  ggplot(aes(x = year, y = impoverishing_risk * 100)) + 
-  geom_line() +
-  scale_y_continuous(limits = c(0, 100)) +  
-  labs(x = "Year", y = "% of Population", title = "US Percentage of Population at Risk of\n Impoverishing Healthcare Expense\n 2003 - 2022") +
-  theme_economist()
-```
+## Private Health Expenditures
+
+I was interested in seeing whether private health expenditures had increased over time, and the below line chart below shows that they certainly have!
 
 ```{r}
 us_data %>% filter(year <= "2021") %>% 
@@ -94,6 +140,13 @@ us_data %>% filter(year <= "2021") %>%
   labs(x = "Year", y = "$ Amount", title = "US Per Capita Private Health Expenditure, 2003 - 2021") +
   theme_economist()
 ```
+
+## Relationship between inflation and market capitalization
+
+Of these indicators, I was most interested in seeing the effect of inflation (if any) on market capitalization. The below scatterplot doesn't show a strong linear relationship between the two metrics, but higher inflation is generally associated with lower market capitalization. There are two very notable outliers:
+
+* In 2009, in the midst of the global financial crisis, the US had the lowest rate of inflation reported in the past 20 years, but total market cap was very low.
+* In 2021, the US reported both the highest inflation rate and the highest total market cap of the last 20 years. I wonder what could be going on with that???
 
 ```{r}
 us_data %>% filter(year <= "2021") %>% 
@@ -105,3 +158,8 @@ us_data %>% filter(year <= "2021") %>%
        title = "Market Capitalization and Inflation in the US, 2003 - 2021") +
   theme_economist()
 ```
+
+## Obstacles
+
+* The WDI API is extremely easy to work with. Perhaps the greatest obstacle is the sheer number of indicators that they report. I found [this](https://data.worldbank.org/indicator) page from their website to be a very helpful resource. 
+* Unrelated to the technical aspects of the data, I was unable to find good metrics for tracking poverty in the United States. The indicator "Proportion of people living below 50 percent of median income (%)" (SI.SPR.BL50.ZS) was not available via API.
