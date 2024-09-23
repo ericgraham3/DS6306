@@ -1,0 +1,103 @@
+---
+title: "Week 5 FLS"
+author: "Eric Graham"
+date: "2024-9-22"
+output: 
+  powerpoint_presentation:
+    slide_level: 2
+    reference_doc: presentation.pptx
+---
+
+```{r setup, include=FALSE, echo=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, results = "hide")
+library(dplyr)
+library(ggplot2)
+library(ggthemes)
+library(stringr)
+```
+
+# 1: Basketball Player Height
+
+```{r, echo = TRUE, results = "markdown"}
+bb = read.csv("PlayersBBall.csv", header =TRUE)
+
+bb = bb %>%
+  filter(!is.na(position)) %>% 
+  mutate(height_split = str_split(height, "-")) %>%
+  mutate(
+    feet = as.numeric(sapply(height_split, `[`, 1)),
+    inches = as.numeric(sapply(height_split, `[`, 2))
+  ) %>%
+  mutate(height_in_inches = (feet * 12) + inches)
+```
+
+---
+
+```{r, echo = TRUE, results = "markdown"}
+bb %>% ggplot(aes(x = position, y = height_in_inches, color = position)) +
+  geom_boxplot() +
+  ylab("Height in Inches") +
+  xlab("Position") +
+  ylab("Height") +
+  ggtitle("Distribution of Heights for All Positions") +
+  theme_economist()
+```
+
+# 2: FIFA Player Height and Weight
+
+```{r, echo = TRUE, results = "markdown"}
+fifa = read.csv("FIFA Players.csv", header =TRUE)
+
+fifa = fifa %>%
+  filter(!is.na(Position)) %>% 
+  mutate(height_split = str_split(Height, "'")) %>%
+  mutate(
+    feet = as.numeric(sapply(height_split, `[`, 1)),
+    inches = as.numeric(sapply(height_split, `[`, 2))
+  ) %>%
+  mutate(height_in_inches = (feet * 12) + inches) %>% 
+  mutate(weight_numeric = str_extract(Weight, "\\d+"))
+```
+
+---
+
+```{r, echo = TRUE, results = "markdown"}
+fifa %>% ggplot(aes(x = weight_numeric, y = height_in_inches)) +
+  geom_point(position = "jitter") +
+  xlab("Weight") +
+  ylab("Height") +
+  ggtitle("Distribution of Heights and Weights") +
+  scale_x_discrete(breaks = as.numeric(c("100", "125", "150", "175", "200", "225", "250")))+
+  theme_economist()
+```
+
+```{r, echo = TRUE, results = "markdown"}
+fifa = read.csv("FIFA Players.csv", header =TRUE)
+
+fifa = fifa %>%
+  filter(Position == "LB" | Position == "LM") %>% 
+  mutate(height_split = str_split(Height, "'")) %>%
+  mutate(
+    feet = as.numeric(sapply(height_split, `[`, 1)),
+    inches = as.numeric(sapply(height_split, `[`, 2))
+  ) %>%
+  mutate(height_in_inches = (feet * 12) + inches) %>% 
+  mutate(weight_numeric = str_extract(Weight, "\\d+"))
+```
+
+---
+
+```{r, echo = TRUE, results = "markdown"}
+fifa %>% ggplot(aes(x = weight_numeric, y = height_in_inches)) +
+  geom_point(position = "jitter") +
+  xlab("Weight") +
+  ylab("Height") +
+  ggtitle("Distribution of Heights and Weights") +
+  scale_x_discrete(breaks = as.numeric(c("100", "125", "150", "175", "200", "225", "250"))) +
+  facet_wrap(~Position) +
+  theme_economist()
+```
+
+# 3: Baby Names (didn't complete)
+
+# 4: Takeaways and Questions
