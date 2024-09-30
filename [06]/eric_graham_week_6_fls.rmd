@@ -1,0 +1,98 @@
+---
+title: "Week  FLS"
+author: "Eric Graham"
+date: "2024- - "
+output: 
+  powerpoint_presentation:
+    slide_level: 2
+    reference_doc: presentation.pptx
+---
+
+```{r setup, include=FALSE, echo=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, results = "hide")
+library(dplyr)
+library(ggplot2)
+library(ggthemes)
+library(class)
+library(caret)
+library(e1071)
+library(caTools)
+library(tidyverse)
+```
+
+```{r}
+titanic = read.csv("titanic_train.csv", header = TRUE)
+
+set.seed(1)
+training_flag = sample(nrow(titanic), size = 600)
+train = titanic[training_flag, ]
+test = titanic[-training_flag, ]
+nrow(train)
+nrow(test)
+head(train)
+
+train = train %>% drop_na(c("Pclass", "Age"))
+test = test %>% drop_na(c("Pclass", "Age"))
+classifications = knn(train[, c("Pclass", "Age")], test[, c("Pclass", "Age")], train$Survived, k = 5, prob = TRUE)
+classifications
+confusionMatrix(table(classifications, test$Survived))
+```
+
+```{r}
+titanic_21 = titanic %>% filter(Age == "21")
+
+set.seed(1)
+training_flag = sample(nrow(titanic_21), size = nrow(titanic_21)*.7)
+train = titanic_21[training_flag, ]
+test = titanic_21[-training_flag, ]
+nrow(train)
+nrow(test)
+
+train = train %>% drop_na(c("Pclass", "Age"))
+test = test %>% drop_na(c("Pclass", "Age"))
+classifications = knn(train[, c("Pclass", "Age")], test[, c("Pclass", "Age")], train$Survived, k = 5, prob = TRUE)
+classifications
+confusionMatrix(table(classifications, test$Survived))
+```
+
+```{r}
+titanic_m = titanic %>% filter(Sex == "male")
+
+set.seed(1)
+training_flag = sample(nrow(titanic_m), size = nrow(titanic_m) * 0.7)
+train = titanic_m[training_flag, ]
+test = titanic_m[-training_flag, ]
+nrow(train)
+nrow(test)
+
+train = train %>% drop_na(c("Pclass", "Age"))
+test = test %>% drop_na(c("Pclass", "Age"))
+classifications = knn(train[, c("Pclass", "Age")], test[, c("Pclass", "Age")], train$Survived, k = 5, prob = TRUE)
+classifications
+confusionMatrix(table(classifications, test$Survived))
+```
+
+```{r}
+titanic_f = titanic %>% filter(Sex == "female")
+
+set.seed(1)
+training_flag = sample(nrow(titanic_f), size = nrow(titanic_f) * 0.7)
+train = titanic_f[training_flag, ]
+test = titanic_f[-training_flag, ]
+nrow(train)
+nrow(test)
+
+train = train %>% drop_na(c("Pclass", "Age"))
+test = test %>% drop_na(c("Pclass", "Age"))
+classifications = knn(train[, c("Pclass", "Age")], test[, c("Pclass", "Age")], train$Survived, k = 5, prob = TRUE)
+classifications
+confusionMatrix(table(classifications, test$Survived))
+```
+
+```{r}
+trainIndices = sample(1:dim(iris)[1],round(.7 * dim(iris)[1]))
+train = iris[trainIndices,]
+test = iris[-trainIndices,]
+head(test)
+```
+
