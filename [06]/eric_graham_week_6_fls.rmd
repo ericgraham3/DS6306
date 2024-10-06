@@ -6,10 +6,11 @@ output:
   powerpoint_presentation:
     slide_level: 2
     reference_doc: presentation.pptx
+always_allow_html: yes
 ---
 
 ```{r setup, include=FALSE, echo=FALSE}
-knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, results = "hide")
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 library(dplyr)
 library(ggplot2)
 library(ggthemes)
@@ -18,9 +19,14 @@ library(caret)
 library(e1071)
 library(caTools)
 library(tidyverse)
+library(plotly)
 ```
 
-```{r}
+# Part 1: Titanic
+
+## Reading in and splitting data
+
+```{r, echo = TRUE, results="markup"}
 titanic = read.csv("titanic_train.csv", header = TRUE)
 
 set.seed(1)
@@ -29,8 +35,13 @@ train = titanic[training_flag, ]
 test = titanic[-training_flag, ]
 nrow(train)
 nrow(test)
-head(train)
+```
 
+---
+
+## KNN Classification by Class and Age
+
+```{r, echo = TRUE, results="markup"}
 train = train %>% drop_na(c("Pclass", "Age"))
 test = test %>% drop_na(c("Pclass", "Age"))
 classifications = knn(train[, c("Pclass", "Age")], test[, c("Pclass", "Age")], train$Survived, k = 5, prob = TRUE)
@@ -38,7 +49,11 @@ classifications
 confusionMatrix(table(classifications, test$Survived))
 ```
 
-```{r}
+---
+
+## Predicting Survival by Specific Age (21)
+
+```{r, echo = TRUE, results="markup"}
 titanic_21 = titanic %>% filter(Age == "21")
 
 set.seed(1)
@@ -47,15 +62,22 @@ train = titanic_21[training_flag, ]
 test = titanic_21[-training_flag, ]
 nrow(train)
 nrow(test)
+```
 
+---
+
+```{r, echo = TRUE, results="markup"}
 train = train %>% drop_na(c("Pclass", "Age"))
 test = test %>% drop_na(c("Pclass", "Age"))
 classifications = knn(train[, c("Pclass", "Age")], test[, c("Pclass", "Age")], train$Survived, k = 5, prob = TRUE)
-classifications
 confusionMatrix(table(classifications, test$Survived))
 ```
 
-```{r}
+---
+
+## Separate Model for Sex == "male"
+
+```{r, echo = TRUE, results="markup"}
 titanic_m = titanic %>% filter(Sex == "male")
 
 set.seed(1)
@@ -64,13 +86,20 @@ train = titanic_m[training_flag, ]
 test = titanic_m[-training_flag, ]
 nrow(train)
 nrow(test)
+```
 
+---
+
+```{r, echo = TRUE, results="markup"}
 train = train %>% drop_na(c("Pclass", "Age"))
 test = test %>% drop_na(c("Pclass", "Age"))
 classifications = knn(train[, c("Pclass", "Age")], test[, c("Pclass", "Age")], train$Survived, k = 5, prob = TRUE)
-classifications
 confusionMatrix(table(classifications, test$Survived))
 ```
+
+---
+
+## Separate Model for Sex == "female"
 
 ```{r}
 titanic_f = titanic %>% filter(Sex == "female")
@@ -81,18 +110,73 @@ train = titanic_f[training_flag, ]
 test = titanic_f[-training_flag, ]
 nrow(train)
 nrow(test)
+```
 
+---
+
+```{r, echo = TRUE, results="markup"}
 train = train %>% drop_na(c("Pclass", "Age"))
 test = test %>% drop_na(c("Pclass", "Age"))
 classifications = knn(train[, c("Pclass", "Age")], test[, c("Pclass", "Age")], train$Survived, k = 5, prob = TRUE)
-classifications
 confusionMatrix(table(classifications, test$Survived))
 ```
 
-```{r}
-trainIndices = sample(1:dim(iris)[1],round(.7 * dim(iris)[1]))
+---
+
+# Relationship Between K and Accuracy for Iris Dataset
+
+```{r, echo = TRUE}
+# variable so we can adjust train/test split
+train_split = 0.7
+
+trainIndices = sample(1:dim(iris)[1],round(train_split * dim(iris)[1]))
 train = iris[trainIndices,]
 test = iris[-trainIndices,]
-head(test)
+
+# variable so we can adjust how many k values to test
+iterations = 90
+
+# dataframe to store the accuracy scores for each k value
+accs = data.frame(accuracy = numeric(iterations), k = numeric(iterations))
+
+# loop to run knn with different k values up to the value of iterations and obtain accuracy score
+for(i in 1:iterations)
+{
+  classifications = knn(train[,c(1,2)],test[,c(1,2)],train$Species, prob = TRUE, k = i)
+  table(test$Species,classifications)
+  CM = confusionMatrix(table(test$Species,classifications))
+  accs$accuracy[i] = CM$overall[1]
+  accs$k[i] = i
+}
+```
+
+---
+
+This plot shows the relationship between K and prediction accuracy
+
+```{r, echo = TRUE}
+# plot
+p = accs %>% ggplot(aes(x = k, y = accuracy)) +
+  geom_line() +
+  theme_tufte() +
+  labs(title = "Accuracy as a Function of K", x = "k", y = "Accuracy") +
+  scale_y_continuous(limits = c(0, 1)) +
+  scale_x_continuous(limits = c(0, 90), breaks = c(10,30,50,70,90))
+
+p
+```
+
+```{r, echo = FALSE}
+# knitr doesn't like my fancier plot
+# ggplotly(p)
+```
+
+---
+
+Multiple k values were tied for the highest accuracy score; I assume that there is a computational advantage to using the lowest of these k values (in this case, 10) but I don't know for certain!
+
+```{r}
+accs_sorted = accs %>% arrange(desc(accuracy))
+head(accs_sorted, 10)
 ```
 
