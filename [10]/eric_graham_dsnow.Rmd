@@ -13,13 +13,13 @@ knitr::opts_chunk$set(echo = FALSE)
 
 # IDE: Integrated Development Environment
 
-### What is an IDE?
+## What is an IDE?
 
-* Combine code editor with tools for tools to support software development
+* Combine code editor with tools to support software development
 * So many cool tools!
-* Jupyter Notebooks, VS Code, and Pycharm are available for Linux, Mac, and Windows
+* Jupyter Notebooks, VS Code, and PyCharm are available for Linux, Mac, and Windows
 
-### Public service announcments
+## Public service announcments
 
 * Professors will have requirements and preferences
 * AI code assistants are not a substitute for knowing what to do
@@ -98,7 +98,7 @@ knitr::opts_chunk$set(echo = FALSE)
 * Jack of all trades, master of none?
 * I don't like the Jupyter Notebook interface, but others do
 
-## JetBrains Pycharm
+## JetBrains PyCharm
 
 * Also a traditional IDE
 * Made for Python but also supports R
@@ -108,11 +108,11 @@ knitr::opts_chunk$set(echo = FALSE)
   
 ---
 
-![Pycharm project menu](dsnow_03_01.png)
+![Pycharm project menu](dsnow_03.01.png)
 
 ![Pycharm editor](dsnow_03.02.png)
 
-## Pycharm Pros and Cons
+## PyCharm Pros and Cons
 
 ### Pros
 
@@ -126,3 +126,22 @@ knitr::opts_chunk$set(echo = FALSE)
 * Resource-intensive
 * Learning curve
 * Cadillac Escalade of Python IDEs
+
+## Links!
+
+### Jupyter Notebooks
+
+* [Video guide to setting up Anaconda and Jupyter Notebooks](https://www.youtube.com/watch?v=WUeBzT43JyY&t=12s)
+* [Anaconda documentation](https://docs.anaconda.com/anaconda/install/)
+
+### Visual Studio Code
+
+* [Setting up Visual Studio Code](https://code.visualstudio.com/docs/setup/setup-overview)
+* [Getting started with Python in VS Code](https://code.visualstudio.com/docs/python/python-tutorial)
+* [Github tools for students](https://github.com/education/students)
+
+### Pycharm
+
+* [Pycharm installation documentation](https://www.jetbrains.com/help/pycharm/installation-guide.html#toolbox)
+  * Note: I had issues with updates using the Jetbrains Toolbox, so I did the standalone installation
+* [JetBrains educational licenses](https://www.jetbrains.com/community/education/#students)
