@@ -1,0 +1,128 @@
+---
+title: "Data Science News of the Week"
+author: "Eric Graham"
+date: "2024-10-27"
+output: 
+  powerpoint_presentation:
+    slide_level: 2
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+# IDE: Integrated Development Environment
+
+### What is an IDE?
+
+* Combine code editor with tools for tools to support software development
+* So many cool tools!
+* Jupyter Notebooks, VS Code, and Pycharm are available for Linux, Mac, and Windows
+
+### Public service announcments
+
+* Professors will have requirements and preferences
+* AI code assistants are not a substitute for knowing what to do
+* Follow installation instructions, do your research! 
+  * Especially if you're on Windows!!!
+
+## Linting, Code Completion, and AI Code Assistants
+
+* Code linting highlights errors and style issues
+* Code completion is auto-complete for coding
+* AI code assistants are specialized LLMs (can generate code and answer questions)
+
+## Virtual Environments and Package Management
+
+* Virtual environments are isolated installations of Python and packages
+* Help prevent conflicts between packages and preserves the global local environment
+* Tools like Conda and VENV create and manage virtual environments
+
+## Jupyter Notebooks
+
+* Wide adoption for data science
+  * Powers Kaggle and Google Colab
+* Can be used for Python or R
+* Utilizes .ipynb files
+  * Runs local web server, easily accessed through browser
+  * Notebook files are also supported by other IDEs
+* Commonly installed with Anaconda or Miniconda distribution
+
+---
+
+![Directory of notebooks](dsnow_01_01.png)
+
+![Jupyter notebook editor](dsnow_01_02.png)
+
+## Jupyter Pros and Cons
+
+### Pros
+
+* Combines markdown cells and code chunks
+* Easy to share, reproducible research!
+* Easy to set up and get coding
+
+### Cons
+
+* Doesn't scale well
+  * Less suited to OOP, modularity, code re-use
+* Less performant with large datasets
+* No linting or code completion in web client
+
+## Visual Studio Code
+
+* Not to be confused with Visual Studio!
+* Microsoft
+* More traditional IDE than Jupyter
+
+---
+
+![VS Code editor](dsnow_02_01.png)
+
+![Extension marketplace](dsnow_02_02.png)
+
+## VS Code Pros and Cons
+
+### Pros
+
+* Multi-language
+* Well supported
+  * Extensions for everything, excellent Python linting support
+* Tight integration with Github, profile sync
+  * Optimized for Github Copilot, which students can get for free!
+
+### Cons
+
+* Learning curve to optimize settings and set up extensions for your workflow
+* Can get bloated with extensions
+* Jack of all trades, master of none?
+* I don't like the Jupyter Notebook interface, but others do
+
+## JetBrains Pycharm
+
+* Also a traditional IDE
+* Made for Python but also supports R
+* As students, we can get the pro version of all JetBrains IDEs for free!
+  * JetBrains' proprietary AI code assistant is not free
+  * Plugin support for Github Copilot
+  
+---
+
+![Pycharm project menu](dsnow_03_01.png)
+
+![Pycharm editor](dsnow_03.02.png)
+
+## Pycharm Pros and Cons
+
+### Pros
+
+* Project management and virtual environment/package management
+* Very strong code completion
+* Excellent Jupyter notebook integration
+* Built for Python, great support for DS workflows out of the box
+
+### Cons
+
+* Resource-intensive
+* Learning curve
+* Cadillac Escalade of Python IDEs

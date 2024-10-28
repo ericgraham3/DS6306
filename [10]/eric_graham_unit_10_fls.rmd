@@ -1,0 +1,156 @@
+---
+title: "Unit 10  FLS"
+author: "Eric Graham"
+date: "2024-10-28"
+output: 
+  powerpoint_presentation:
+    slide_level: 2
+    reference_doc: presentation.pptx
+---
+
+```{r setup, include=FALSE, echo=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+options(scipen=999)
+library(dplyr)
+library(ggplot2)
+library(ggthemes)
+library(scales)
+```
+
+# Question 1: Hypothesis Test for Car Dataset
+
+## Fitting the model
+
+Looking at a summary of the linear model (next slide) we can see that the formula for our linear model is:
+
+$$mpg = 46.27 - 0.00767 \times\text{weight}$$
+
+---
+
+```{r}
+df = read.csv("cars.csv", header = TRUE)
+fit = lm(MPG ~ Weight, data = df)
+summary(fit)
+```
+
+## Hypothesis Test Step 1: Problem Statement
+
+We want to test the probability that there is a relationship between weight and MPG, which means testing the likelihood that there is a slope to the regression line. Our null hypothesis is that there is no slope.
+
+$$H_0: \hat{\beta}_1 = 0$$
+$$H_0: \hat{\beta}_1 \neq 0$$
+
+## Step 2: Critical Value
+
+R shows that our critical value is .0627
+
+```{r}
+degrees_freedom = nrow(df) - 2
+crit_val = qt(.95 / 2, degrees_freedom)
+crit_val
+```
+
+## Steps 3, 4, and 5: Test Statistic, P-Value, and Decision
+
+R gives us a test statistic of -29.725 (see next slide), which is much higher than the critical value. Thus, we see a p-value of 2.2e-16, and reject the null hypothesis. 
+
+---
+
+```{r}
+cor.test(df$Weight, df$MPG)
+```
+
+## Confidence Interval
+
+To obtain the confidence interval for the slope, we solve this formula:
+
+$$\hat{\beta_0} \pm  t_{1 - \frac{\alpha}{2}, df} \times SE(\hat{\beta_0})$$
+R shows that our 95% confidence interval for the slope of the linear regression line is between -0.00764516 and -0.00767747. That is a tight confidence interval!
+
+```{r}
+lower_bound = -0.0076613 - crit_val * 0.0002577
+upper_bound = -0.0076613 + crit_val * 0.0002577
+lower_bound
+upper_bound
+```
+
+## Step 6: Conclusion
+
+There is overwhelming statistical evidence to suggest that there is a relationship between car weight and MPG (p-value of 2.2e-16). We are 95% certain that the true slope of the linear regression line for this relationship is between -0.00764516 and -0.00767747. 
+
+## Interpretation of Slope
+
+We are 95% certain that, for every pound of a car's weight, the miles per gallon of that car is reduced by between -0.00764516 MPG and -0.00767747 MPG.
+
+# Question 2: Cross-Validation
+
+## Train/Test Split
+
+I split the dataframe into a 75% training set and a 25% test set. I also create the column for the squared weight.
+
+```{r}
+set.seed(4)
+df$weight_squared = df$Weight^2
+TrainObs = sample(seq(1, nrow(df)), round(0.75 * nrow(df)), replace = FALSE)
+TrainData = df[TrainObs, ]
+TestData = df[-TrainObs, ]
+```
+
+
+## Model 1 MSPE
+
+For Model 1, we see an MSPE of 15.00668.
+
+```{r}
+Model1_fit = lm(MPG ~ Weight, data = TrainData)
+Model1_Preds = predict(Model1_fit, newdata = TestData)
+MSPE_Model1 = mean((TestData$MPG - Model1_Preds)^2)
+MSPE_Model1
+```
+
+
+## Model 2 MSPE
+
+The second model introduces the quadratic term to the regression line equation. The MSPE of 14.07949 is lower than that of Model 1, so we favor Model 2!
+
+```{r}
+Model2_fit = lm(MPG ~ Weight + weight_squared, data = TrainData)
+Model2_Preds = predict(Model2_fit, newdata = TestData)
+MSPE_Model2 = mean((TestData$MPG - Model2_Preds)^2)
+MSPE_Model2
+```
+
+## Interpretation of relationship
+
+The relationship of a car's weight to its MPG is better described by a linear model which incorporates both weight and the squared value of the weight (see next slide for summary):
+
+$$\text{MPG} = 62.32 - 0.01861 \times \text{Weight} + 0.000001727 \times \text{Weight}^2$$
+
+---
+
+```{r}
+options(scipen=999)
+summary(Model2_fit)
+```
+
+## Estimated MPG for 2000lb. Car
+
+The estimated miles per gallon under Model 2 would be 32.008
+
+```{r}
+62.32 - (0.01861 * 2000) + (0.000001727 * (2000)^2)
+```
+
+# Takeaways
+
+1. A linear regression model is a formula for a line (in slope/intercept form) which fits a linear relationship. It can be used to predict values based on an observed linear relationship, though care must be taken when doing this outside the range of the original data.
+2. Hypothesis tests can be used to assess whether a linear model built from a sample is statistically likely to represent an actual relationship.
+3. We can fit linear models with multiple variables, including transformations of existing variables to account for non-linear relationships.
+4. Cross-validation is a technique used to evaluate the relative accuracy of models.
+
+# Questions
+
+1. I'm extremely interested in MLR, I would love to hear more about the assumptions and how they play out in practice (e.g., what does it mean for my analysis that the independence and normality assumptions are often not known to be met). Does this mean we are often telling clients that we need to proceed with caution (keeping the George Box quote in mind)?
+2. Is this where linear algebra/matrix operations are relevant?
+3. I want to learn more about how transformations improve model accuracy.
+4. I was able to follow along with your NBA code to calculate MPSE but I'm not 100% on it conceptually, I want to learn more about that, it seems very important!
