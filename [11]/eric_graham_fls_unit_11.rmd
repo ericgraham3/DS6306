@@ -1,0 +1,238 @@
+---
+title: "Unit 11 FLS"
+author: "Eric Graham"
+date: "2024-11-4"
+output: 
+  powerpoint_presentation:
+    slide_level: 2
+    reference_doc: presentation.pptx
+---
+
+```{r setup, include=FALSE, echo=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, results = "hide")
+library(dplyr)
+library(ggplot2)
+library(ggthemes)
+library(fpp)
+library(fpp2)
+```
+
+# Question 1: SES
+
+I tested the SES code with the ausair data, it looks like our projections were a little more flat than the actual values. There are a lot of accuracy measures, I looked them up and while I don't understand them in-depth the relatively high Theil's U seems to reflect that these weren't the most accurate models (which agrees with the visual examination of the data)
+
+---
+
+```{r, echo = FALSE, results = "markup"}
+# 1. SES MODEL FOR AUS AIR 
+data(ausair)
+
+#returns a ts object
+air = window(ausair, start = 1990, end = 2004)
+
+# Always plot the data first! 
+plot(air,ylab = "Airline Passegners", xlab = "Year", main = "Airline Passengers")
+
+#fit 3 different simple exponential smoothing models ... how are they different?
+# what does the h paramter do? 
+fit1 = ses(air, initial = "simple",alpha = .2,h = 3)
+fit2 = ses(air,initial = "simple",alpha = .6, h = 3)
+fit3 = ses(air, h = 3) #defaults
+
+# the forecast package has a nice accuracy funciton with various metrics just pass it the 
+# the model and the data!  (This is the "training" data)
+accuracy(fit1, ausair)
+accuracy(fit2, ausair)
+accuracy(fit3, ausair)
+
+#Reset the plot
+plot(air,ylab = "Airline Passegners", xlab = "Year", type = "o", xlim = c(1990, 2008),ylim = c(15,50), main = "Airline Passengers")
+
+#Plot the estimated values from the models .. the "fitted" values are the training values.
+lines(fitted(fit1), col = "blue", type = "o")
+lines(fitted(fit2), col = "red", type = "o")
+lines(fitted(fit3), col = "green", type = "o")
+
+# the  $mean values are the forecasts.
+lines(fit1$mean, col = "blue", type = "o")
+lines(fit2$mean, col = "red", type = "o")
+lines(fit3$mean, col = "green", type = "o")
+
+# These are the actual values!  Compare visually with the forecasts!
+air2008 = window(ausair, start = 1990, end = 2007)
+points(air2008, type = "o")
+
+# Compare the forecasts with the actual values with various fit metrics.  
+accuracy(fit1, air2008)
+accuracy(fit2, air2008)
+accuracy(fit3, air2008)
+```
+
+# Question 2: Holt's Linear
+
+Holt's Linear Trend Model appears to be a bit more accurate, the forecast line for fit1h is closer to the actual values, and the Theil's U is below 1. Holt's introduces a trend component to the model, which might have been the critical factor in this case. 
+
+```{r}
+#2 Holt's Linear Trend Model for AUS AIR
+fit1h = holt(air, alpha = .8, beta = .2, initial = "simple", h = 5)
+fit2h = holt(air, alpha = .8, beta = .2, initial = "simple", exponential = TRUE, h = 5)
+
+# Check out estiamted values of the "training" data from the first holt model 
+fitted(fit1h)
+# Check out the forecast value (h of them)
+fit1h$mean
+
+# Reset the Plot!
+plot(air,ylab = "Airline Passegners", xlab = "Year", type = "o", xlim = c(1990, 2009),ylim = c(15,60))
+#Plot each models estimated values of the training data (Do these one by one to see the differences)
+lines(fitted(fit1h),col = "blue", type= "o")
+lines(fitted(fit2h), col = "red", type= "o")
+#Plot each models forecasts (Do these one by one to see the differences)
+lines(fit1h$mean, col = "blue", type= "o")
+lines(fit2h$mean,col = "red", type= "o")
+
+# Fit another model ... damped!  
+fit3h = holt(air, alpha = .8, beta = .2, damped = TRUE, initial = "optimal", h = 5)
+# Plot the fitted value (estimated from triaining data)
+lines(fitted(fit3h), col = "darkgreen", type= "o")
+# Plot the forecasts
+lines(fit3h$mean,col = "darkgreen", type= "o")
+
+# Fit another model ... what is the difference?  
+fit4h = holt(air, alpha = .8, beta = .2, damped = TRUE, initial = "optimal", exponential = TRUE, h = 5)
+# Plot the fitted value (estimated from triaining data)
+lines(fitted(fit4h), col = "cyan", type= "o")
+#Plot the forecasts
+lines(fit4h$mean,col = "cyan", type= "o")
+
+# with implicit Test set... it figures out by the time which are training and which are test. 
+accuracy(fit1h, ausair)
+accuracy(fit2h, ausair)
+accuracy(fit3h, ausair)
+
+#with explicit Test set ... (same output)
+airTest = window(ausair, start = 2005)
+accuracy(fit1h, airTest)
+accuracy(fit2h, airTest)
+accuracy(fit3h, airTest)
+
+#Add the actual values to visually compare forecasts to actual values
+air2008 = window(ausair, start = 1990, end = 2009)
+points(air2008, type = "o")
+```
+
+# Question 3: Holt Seasonal
+
+This model appears to be the most accurate of all! Fit1s and Fit2s both have very low Theil's U scores, and the forecast lines are right there with the actual values. As the name would indicate, Holt Seasonal adds a seasonal comoonent to the model. Intuitively it would make sense that this would more closely track with air travel patterns for international tourists, and the data bears that out.
+
+```{r}
+#Load the data
+data("austourists")
+# Read about the dataset!
+?austourists
+
+
+# Always plot the data first!
+plot(austourists)
+
+# returns a ts object.  
+aust = window(austourists,start = 1999, end = 2004)
+
+#fit an additive and multiplicative model
+fit1s = hw(aust,seasonal = "additive",h = 40)
+fit2s = hw(aust,seasonal = "multiplicative",h = 40)
+
+#Plot the original data
+plot(aust,ylab = "Australian Tourists", xlab = "Year", type = "o", xlim = c(1999, 2014),ylim = c(15,60))
+#add the fitted values from the model (of the training data)
+lines(fitted(fit1s),col = "blue", type= "o")
+lines(fitted(fit2s), col = "red", type= "o")
+
+#Now add the forecasts (add these one at a time)
+lines(fit1s$mean, col = "blue", type= "o")
+lines(fit2s$mean,col = "red", type= "o")
+
+#Compare the accuracy
+accuracy(fit1s,austourists)
+accuracy(fit2s,austourists)
+
+#add the actual values to visually compare the forecasts to the actual values. 
+points(austourists, type = "o")
+```
+
+# Question 4: Full Analysis of Temperature Data
+
+Maxtemp is a time series object, an exciting new type of object that you can't use filter() on! You have to use the window() function instead. As always, plot the data first! This data is noisy, but there might be a slight positive trend.
+
+```{r, results='markup'}
+data = fpp2::maxtemp
+
+maxtemp_1990_to_2016 = window(data, start = 1990)
+
+plot(maxtemp_1990_to_2016, main = "Historical Temperature Maximum Temperatures (1990-2016)",
+     ylab = "Temperature (°C)", xlab = "Year", col = "black")
+```
+
+## SES Model
+
+SES doesn't account for seasonality or trends, so it's best suited to relatively stable data. As shown above, our data is not stable! The AIC and BIC values for this model are 140.4868 and 144.3743 and the RMSE is 2.322. These metrics alone can't determine whether our model is a good fit; this might be the best model available for this data! These metrics are useful for comparing the performance of this model to that of another. 
+
+```{r, results='markup'}
+# fit SES model and plot
+ses_fit = ses(maxtemp_1990_to_2016, h = 5)
+
+plot(ses_fit, main = "SES Forecast for Maximum Temperatures (1990-2021)",
+     ylab = "Temperature (°C)", xlab = "Year", col = "black")
+lines(fitted(ses_fit), col = "blue", lwd = 2)
+
+ses_aic = AIC(ses_fit$model)
+ses_bic = BIC(ses_fit$model)
+ses_aic
+ses_bic
+
+ses_residuals = residuals(ses_fit)
+ses_rmse = sqrt(mean(ses_residuals^2, na.rm = TRUE))
+ses_rmse
+```
+
+## Holt Model
+
+Holt's Linear Model can handle trends, which might make it a better fit for this data than SES. The AIC and BIC values for our Holt model are both a bit higher than those for the SES model (141.3865 and 149.1615), indicating a less-good fit. However, the RMSE is lower (2.113041) which indicates that this model might be a better fit. 
+
+```{r, results='markup'}}
+holt_fit = holt(maxtemp_1990_to_2016, h = 5, damped = TRUE, initial = "optimal")
+
+plot(holt_fit, main = "Holt's Damped Forecast for Maximum Temperatures (1990-2021)",
+     ylab = "Temperature (°C)", xlab = "Year", col = "black")
+lines(fitted(holt_fit), col = "red", lwd = 2)
+
+holt_aic = AIC(holt_fit$model)
+holt_bic = BIC(holt_fit$model)
+holt_aic
+holt_bic
+
+holt_residuals = residuals(holt_fit)
+holt_rmse = sqrt(mean(holt_residuals^2, na.rm = TRUE))
+holt_rmse
+```
+
+## Comparing the Models
+
+RMSE is a better metric when predictive accuracy is prioritized. AIC and BIC penalize complex models, which would explain why SES (the simpler model) scores better on these metrics. I don't know (yet) when you would prioritize simplicity over accuracy, but in this case I will note that climate modeling intuitively seems very complex, and accuracy is very important, so I would favor the Holt Linear model over the SES model in this case.
+
+# Takeaways and Questions
+
+## Takeaways
+
+1. Always do EDA first to look for patterns
+2. SES is a simple model which is good for stable data, whereas Holt's models are better for data with trends or seasonal components. The different Holts models are additive or multiplicative for the seasonal/trend components, which gives some flexibility in model selection.
+3. Holts models can overforecast, so dampening parameters can be assigned to smooth out the forecast.
+4. There are a lot of metrics for analyzing forecasting performance, and different use cases will prioritize different metrics.
+
+## Questions
+
+1. Going back to the temperature data, why wouldn't we always favor accuracy in our predictions? Is the tradeoff between the models here one between predictive accuracy and the risk of overfitting?
+2. This is fascinating, looking forward to the lecture!
+
+
+
