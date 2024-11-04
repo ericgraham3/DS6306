@@ -169,7 +169,7 @@ data = fpp2::maxtemp
 
 maxtemp_1990_to_2016 = window(data, start = 1990)
 
-plot(maxtemp_1990_to_2016, main = "Historical Temperature Maximum Temperatures (1990-2016)",
+plot(maxtemp_1990_to_2016, main = "Historical Maximum Temperatures (1990-2016)",
      ylab = "Temperature (°C)", xlab = "Year", col = "black")
 ```
 
@@ -181,7 +181,7 @@ SES doesn't account for seasonality or trends, so it's best suited to relatively
 # fit SES model and plot
 ses_fit = ses(maxtemp_1990_to_2016, h = 5)
 
-plot(ses_fit, main = "SES Forecast for Maximum Temperatures (1990-2021)",
+plot(ses_fit, main = "SES Forecast for Maximum Temperatures (1990-2016)",
      ylab = "Temperature (°C)", xlab = "Year", col = "black")
 lines(fitted(ses_fit), col = "blue", lwd = 2)
 
@@ -199,10 +199,10 @@ ses_rmse
 
 Holt's Linear Model can handle trends, which might make it a better fit for this data than SES. The AIC and BIC values for our Holt model are both a bit higher than those for the SES model (141.3865 and 149.1615), indicating a less-good fit. However, the RMSE is lower (2.113041) which indicates that this model might be a better fit. 
 
-```{r, results='markup'}}
+```{r, results='markup'}
 holt_fit = holt(maxtemp_1990_to_2016, h = 5, damped = TRUE, initial = "optimal")
 
-plot(holt_fit, main = "Holt's Damped Forecast for Maximum Temperatures (1990-2021)",
+plot(holt_fit, main = "Holt's Damped Forecast for Maximum Temperatures (1990-2016)",
      ylab = "Temperature (°C)", xlab = "Year", col = "black")
 lines(fitted(holt_fit), col = "red", lwd = 2)
 
