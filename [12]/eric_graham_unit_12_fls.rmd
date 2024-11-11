@@ -1,0 +1,36 @@
+---
+title: "Unit 12 FLS"
+author: "Eric Graham"
+date: "2024-11-10"
+output: 
+  powerpoint_presentation:
+    slide_level: 2
+    reference_doc: presentation.pptx
+---
+
+```{r setup, include=FALSE, echo=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, results = "hide")
+library(dplyr)
+library(ggplot2)
+library(ggthemes)
+library(scales)
+```
+
+# R Shiny Dashboard for Attrition EDA
+
+I set out to create an interactive dashboard to recreate my EDA from the Attrition project, and [I was able to get at least a prototype up and running!](https://6cehs1-eric-graham.shinyapps.io/attrition-eda/) A few notes/challenges:
+
+1. I couldn't get the height of my containers to scale properly, this is the number one frustration.
+2. I have done simple projects in Django, which is a similar framework on Python, and I was truly impressed with how easy it was to get a prototype up and running in Shiny. Of course, I could spend more time tweaking the aesthetics than I spend on the actual EDA, but at some point I had to say "This is Version 1.0."
+
+#### Opportunities for expansion:
+
+1. Dark mode toggle (I found documentation on this but didn't have time to implement)
+2. Results of chi-square/correlation testing (and heatmaps)
+3. If I had time I would probably focus on adding more actual text, you can link an .md document directly to your shiny UI, and it would be a good way to explain to the user what they are looking at. As it stands, I am now among the infinite shinyapps projects that is just a collection of tabs, dropdowns, and ggplots. But this would be a huge help to communicating results to the user.
+
+# Takeaways and Questions
+
+* R Shiny makes it surprisingly easy to create dashboards out of existing R code.
+* shinyapps.io is a free, accessible way to publish those dashboards, it's very cool of Posit to do this!
+* There is no limit to the number of questions one could ask about this, it's a great tool and I look forward to the lecture (and seeing everyone's projects!)
