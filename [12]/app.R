@@ -122,7 +122,7 @@ server = function(input, output) {
       geom_boxplot(fill = "#7495B8") +
       labs(x = col_name, y = "", title = paste("Boxplot of", col_name)) +
       theme_few() +
-      theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
+      scale_x_continuous(breaks = scales::pretty_breaks(n = 5))  # Add tick marks
   })
   
   # Discrete variables
