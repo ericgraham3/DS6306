@@ -18,7 +18,7 @@ library(scales)
 
 # R Shiny Dashboard for Attrition EDA
 
-I set out to create an interactive dashboard to recreate my EDA from the Attrition project, and [I was able to get at least a prototype up and running!](https://6cehs1-eric-graham.shinyapps.io/attrition-eda/) A few notes/challenges:
+I set out to create an interactive dashboard to recreate my EDA from the Attrition project, and [I was able to get at least a prototype up and running!](https://ericgraham.shinyapps.io/attrition-eda/) A few notes/challenges:
 
 1. I couldn't get the height of my containers to scale properly, this is the number one frustration.
 2. I have done simple projects in Django, which is a similar framework on Python, and I was truly impressed with how easy it was to get a prototype up and running in Shiny. Of course, I could spend more time tweaking the aesthetics than I spend on the actual EDA, but at some point I had to say "This is Version 1.0."
