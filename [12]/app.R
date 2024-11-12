@@ -1,22 +1,9 @@
----
-title: "Case Study 1 - Attrition"
-author: "Eric Graham"
-output: html_document
-runtime: shiny
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
 library(shiny)
 library(ggplot2)
 library(dplyr)
 library(skimr)
 library(scales)
 library(ggthemes)
-```
-
-
-```{r, echo=FALSE}
 
 # Load data
 df = read.csv("CaseStudy1-data.csv")
@@ -26,15 +13,15 @@ df[cat_vars] = lapply(df[cat_vars], as.factor)
 cat_vars_no_attrition = setdiff(cat_vars, "Attrition")
 
 continuous_vars = c("Age", "DailyRate", "DistanceFromHome", "HourlyRate", "MonthlyIncome", "MonthlyRate", 
-                     "PercentSalaryHike", "TotalWorkingYears", "YearsAtCompany", "YearsInCurrentRole", 
-                     "YearsSinceLastPromotion", "YearsWithCurrManager")
+                    "PercentSalaryHike", "TotalWorkingYears", "YearsAtCompany", "YearsInCurrentRole", 
+                    "YearsSinceLastPromotion", "YearsWithCurrManager")
 discrete_vars = c("Education", "EnvironmentSatisfaction", "JobInvolvement", "JobLevel", "JobSatisfaction", 
-                   "NumCompaniesWorked", "PerformanceRating", "RelationshipSatisfaction", 
-                   "StockOptionLevel", "TrainingTimesLastYear", "WorkLifeBalance")
+                  "NumCompaniesWorked", "PerformanceRating", "RelationshipSatisfaction", 
+                  "StockOptionLevel", "TrainingTimesLastYear", "WorkLifeBalance")
 
 # UI
 ui = fluidPage(
-  titlePanel("Exploratory Data Analysis"),
+  titlePanel("Attrition Case Study - Exploratory Data Analysis"),
   tabsetPanel(
     tabPanel("Categorical Variables", 
              sidebarLayout(
@@ -72,7 +59,7 @@ ui = fluidPage(
                ),
                mainPanel(
                  div(style = "height: 1000px; overflow-y: auto;",
-                     plotOutput("discrete_bar", height = "1000px")
+                     plotOutput("discrete_bar", height = "500px")
                  )
                )
              )
@@ -90,7 +77,7 @@ server = function(input, output) {
       df[df$Attrition == input$attrition_filter, ]
     }
   })
-
+  
   # Categorical variables
   output$cat_plot = renderPlot({
     col_name = input$cat_var
@@ -103,7 +90,7 @@ server = function(input, output) {
       theme_few() +
       theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1, size = 8))
   })
-
+  
   output$cat_count_plot = renderPlot({
     col_name = input$cat_var
     container_df = data.frame(value = filtered_data()[[col_name]])
@@ -114,7 +101,7 @@ server = function(input, output) {
       theme_few() +
       theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1, size = 8))
   })
-
+  
   # Continuous variables
   output$cont_hist = renderPlot({
     col_name = input$cont_var
@@ -126,7 +113,7 @@ server = function(input, output) {
       theme_few() +
       theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1, size = 8))
   })
-
+  
   output$cont_boxplot = renderPlot({
     col_name = input$cont_var
     container_df = data.frame(value = filtered_data()[[col_name]])
@@ -137,7 +124,7 @@ server = function(input, output) {
       theme_few() +
       theme(axis.text.x = element_blank(), axis.ticks.x = element_blank())
   })
-
+  
   # Discrete variables
   output$discrete_bar = renderPlot({
     col_name = input$discrete_var
@@ -153,5 +140,3 @@ server = function(input, output) {
 
 # Run
 shinyApp(ui, server)
-
-```
